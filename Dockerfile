@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:jre-11.0.11_9-alpine
+FROM adoptopenjdk/openjdk11:alpine-jre
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 ARG JAR_FILE=target/*.jar
