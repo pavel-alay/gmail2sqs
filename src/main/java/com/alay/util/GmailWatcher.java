@@ -25,6 +25,7 @@ public class GmailWatcher {
             try {
                 sqsService.send(message2Event(email));
                 gmail.markAsRead(email);
+                log.info("message enqueued");
             } catch (Exception e) {
                 log.error(e.getMessage());
             }

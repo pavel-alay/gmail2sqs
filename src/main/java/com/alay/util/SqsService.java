@@ -21,6 +21,7 @@ public class SqsService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SqsService(SqsProperties properties, AmazonSQSAsync messagingTemplate) {
+        log.info("SQS queue url: {}", properties.getUrl());
         this.properties = properties;
         this.amazonSqs = messagingTemplate;
     }
@@ -35,7 +36,5 @@ public class SqsService {
         if (!messageChannel.send(msg, properties.getTimeout())) {
             throw new RuntimeException("Failed to send message");
         }
-        log.info("message sent");
     }
-
 }

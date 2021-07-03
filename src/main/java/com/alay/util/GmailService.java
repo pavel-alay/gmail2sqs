@@ -1,6 +1,5 @@
 package com.alay.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.auth.oauth2.BearerToken;
 import com.google.api.client.auth.oauth2.ClientParametersAuthentication;
 import com.google.api.client.auth.oauth2.Credential;
@@ -54,6 +53,8 @@ public class GmailService {
 
 
     public GmailService(GmailProperties gmailProperties) throws GeneralSecurityException, IOException {
+        log.info("Search queue: {}", gmailProperties.getSearchQuery());
+        log.info("Search patterns: {}", Arrays.toString(gmailProperties.getSearchPatterns()));
         HttpTransport transport = GoogleNetHttpTransport.newTrustedTransport();
         JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
         gmail = new Gmail.Builder(transport, jsonFactory,
@@ -95,6 +96,7 @@ public class GmailService {
             if (filter(message)) {
                 result.add(message);
             } else {
+                log.info("Ignore message: {}, {}", getSubject(message), getDate(message));
                 ignore(message);
             }
         }
@@ -133,6 +135,16 @@ public class GmailService {
             ZoneOffset.UTC);
         return ZonedDateTime.of(dateTime, ZoneOffset.UTC)
             .withZoneSameInstant(TARGET_TIME_ZONE).toEpochSecond();
+    }
+
+    public String getSubject(Message msg) {
+        return msg.getPayload().getHeaders().stream()
+            .filter(h -> {
+                return "Subject".equals(h.getName());
+            })
+            .findFirst()
+            .orElseGet(() -> new MessagePartHeader().setValue("unknown"))
+            .getValue();
     }
 
     @SneakyThrows
@@ -193,7 +205,7 @@ public class GmailService {
     }
 
     static boolean notInSent(Message msg) {
-        return ! msg.getLabelIds().contains("SENT");
+        return !msg.getLabelIds().contains("SENT");
     }
 
     static MessagePart getBodyPart(Message msg) {
