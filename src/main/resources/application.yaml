@@ -1,0 +1,25 @@
+sqs:
+  url: https://sqs.us-east-1.amazonaws.com/123456789/some-queue
+  group-id: gmail2sqs
+  timeout: 1000
+gmail:
+  access-token: some-access-token
+  refresh-token: some-refresh-token
+  client-id: 123456789-secret.apps.googleusercontent.com
+  client-secret: AbC-Secret123
+  encoded-url: https://oauth2.googleapis.com/token
+  search-query: label:inbox
+  search-patterns:
+    - ^Notification.*
+    - уведомление.*
+  max-size: 512
+  read-labels:
+    add:
+      - read
+      - inbox
+    remove:
+      - unread
+  ignore-labels:
+    add:
+    remove:
+      - unread
