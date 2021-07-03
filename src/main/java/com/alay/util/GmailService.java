@@ -78,8 +78,8 @@ public class GmailService {
 
         ignoreLabelsAdd = convertToLabelIds(labelIds, gmailProperties.getIgnoreLabels().getAdd());
         ignoreLabelsRemove = convertToLabelIds(labelIds, gmailProperties.getIgnoreLabels().getRemove());
-        readLabelsAdd = convertToLabelIds(labelIds, gmailProperties.getIgnoreLabels().getAdd());
-        readLabelsRemove = convertToLabelIds(labelIds, gmailProperties.getIgnoreLabels().getRemove());
+        readLabelsAdd = convertToLabelIds(labelIds, gmailProperties.getReadLabels().getAdd());
+        readLabelsRemove = convertToLabelIds(labelIds, gmailProperties.getReadLabels().getRemove());
     }
 
     public Iterable<Message> getUnreadMessages() throws IOException {
