@@ -3,7 +3,7 @@
 ## Build docker image
 
 ```bash
-./mvnw -DskipTests spring-boot:build-image -Dspring-boot.build-image.imageName=gmail2sqs
+mvn clean package -DskipTests && docker build -t gmail2sqs:latest .
 ```
 
 ## Docker compose
@@ -20,4 +20,38 @@ services:
       AWS_REGION: us-east-1
       AWS_ACCESS_KEY_ID: AKEXAMPLE
       AWS_SECRET_ACCESS_KEY: secretaccesskey123
+      SPRING_APPLICATION_JSON: '{
+            "gmail": {
+            "accessToken": "some-access-token",
+            "clientId": "123456789-secret.apps.googleusercontent.com",
+            "clientSecret": "AbC-Secret123",
+            "encodedUrl": "https://oauth2.googleapis.com/token",
+            "ignoreLabels": {
+                "add": [],
+                "remove": [
+                    "unread"
+                ]
+            },
+            "maxSize": 512,
+            "readLabels": {
+                "add": [
+                    "inbox"
+                ],
+                "remove": [
+                    "unread"
+                ]
+            },
+            "refreshToken": "some-refresh-token",
+            "searchPatterns": [
+                "^Notification.*",
+                "уведомление.*"
+            ],
+            "searchQuery": "label:inbox"
+        },
+        "sqs": {
+            "group-id": "gmail2sqs",
+            "timeout": 1000,
+            "url": "https://sqs.us-east-1.amazonaws.com/123456789/some-queue"
+        }
+    }'      
 ```
