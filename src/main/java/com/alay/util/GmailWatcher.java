@@ -19,7 +19,7 @@ public class GmailWatcher {
         this.sqsService = sqsService;
     }
 
-    @Scheduled(fixedDelay = 15000)
+    @Scheduled(fixedDelay = 60000)
     public void checkNewMail() throws IOException {
         for (Message email : gmail.getUnreadMessages()) {
             try {

@@ -14,7 +14,12 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.gmail.Gmail;
-import com.google.api.services.gmail.model.*;
+import com.google.api.services.gmail.model.Label;
+import com.google.api.services.gmail.model.ListMessagesResponse;
+import com.google.api.services.gmail.model.Message;
+import com.google.api.services.gmail.model.MessagePart;
+import com.google.api.services.gmail.model.MessagePartHeader;
+import com.google.api.services.gmail.model.ModifyMessageRequest;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,7 +30,13 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -57,10 +68,12 @@ public class GmailService {
         log.info("Search patterns: {}", Arrays.toString(gmailProperties.getSearchPatterns()));
         HttpTransport transport = GoogleNetHttpTransport.newTrustedTransport();
         JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
+        Credential credentialWithRefreshToken = createCredentialWithRefreshToken(transport, jsonFactory, gmailProperties);
         gmail = new Gmail.Builder(transport, jsonFactory,
-            createCredentialWithRefreshToken(transport, jsonFactory, gmailProperties))
+            credentialWithRefreshToken)
             .setApplicationName("Gmail to SQS Forwarder")
             .build();
+
         searchQuery = gmailProperties.getSearchQuery();
         maxSize = gmailProperties.getMaxSize();
         searchPredicates = Arrays.stream(gmailProperties.getSearchPatterns())
